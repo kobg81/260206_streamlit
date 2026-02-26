@@ -297,9 +297,9 @@ st.title("🛡️ 협약 데이터 및 당해년도 연구비 통합 검증")
 col1, col2 = st.columns(2)
 with col1: 
 	st.image("contracts.png", caption="[예시] 협약서 다운로드", use_container_width=True)
-    f_agreement = st.file_uploader("1. 협약서 (PDF) - 왼쪽", type=['pdf'])
+f_agreement = st.file_uploader("1. 협약서 (PDF) - 왼쪽", type=['pdf'])
 with col2: 
-    f_receipt = st.file_uploader("2. 협약접수확인서 (PDF) - 오른쪽", type=['pdf'])
+f_receipt = st.file_uploader("2. 협약접수확인서 (PDF) - 오른쪽", type=['pdf'])
 
 st.write("---")
 	st.image("budgets.png", caption="[예시] 사업비 다운로드", use_container_width=True)
@@ -411,3 +411,4 @@ if f_receipt and f_agreement and f_fund:
 elif not (f_receipt and f_agreement and f_fund):
 
     st.info("👆 위 3개의 파일을 모두 업로드하면 분석 결과가 표시됩니다.")
+
