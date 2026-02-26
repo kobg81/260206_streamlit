@@ -305,7 +305,6 @@ with col2:
 
 st.write("---")
 
-st.image("budgets.png", caption="[예시] 사업비 다운로드", use_container_width=True)
 f_fund = st.file_uploader("3. 연구비분담표 (Excel) - 하단", type=['xlsx', 'xls'])
 
 if f_receipt and f_agreement and f_fund:
@@ -413,4 +412,5 @@ if f_receipt and f_agreement and f_fund:
 
 elif not (f_receipt and f_agreement and f_fund):
     st.info("👆 위 3개의 파일을 모두 업로드하면 분석 결과가 표시됩니다.")
+
 
