@@ -288,9 +288,12 @@ def generate_excel_file(agreement_data, sheet2_data, current_year, receipt_data)
             ws2.column_dimensions['B'].width = 25 # 1열 개발기관명
             ws2.column_dimensions['C'].width = 15 # 2열 사업자번호
             ws2.column_dimensions['D'].width = 25 # 3열 역할
-            ws2.column_dimensions['E'].width = 25
-            ws2.column_dimensions['F'].width = 25
-            ws2.column_dimensions['G'].width = 25
+            ws2.column_dimensions['E'].width = 10
+            ws2.column_dimensions['F'].width = 15
+            ws2.column_dimensions['G'].width = 15
+            ws2.column_dimensions['H'].width = 15
+            ws2.column_dimensions['I'].width = 15
+            ws2.column_dimensions['J'].width = 15
 
         for ws in workbook.worksheets:
             for row in ws.iter_rows(min_row=2): 
@@ -359,9 +362,11 @@ if f_receipt and f_agreement and f_fund:
                             "GT_BUSSNO 사업자번호": biz_no,
                             "3열 주관연구개발기관 또는 공동연구개발기관": role_title,
                             "4열 당해년도": fund['당해년도'],
+                            "GI_CASH 연구개발기관 부담금(현금)": fund['기관부담금(현금)'],
+                            "GI_INK 연구개발기관 부담금(현물)": fund['기관부담금(현물)'],
                             "GI_GOVFUND 정부지원금(현금)": fund['정부지원금(현금)'],
-                            "GI_PRIVCASH 연구개발기관 부담금(현금)": fund['기관부담금(현금)'],
-                            "GI_PRIVINK 연구개발기관 부담금(현물)": fund['기관부담금(현물)']
+                            "GI_PRIVCASH 연구개발기관 수행금(현금)": fund['기관부담금(현금)'],
+                            "GI_PRIVINK 연구개발기관 수행금(현물)": fund['기관부담금(현물)']
                 })
         else:
             sheet2_export_data.append({
@@ -370,9 +375,11 @@ if f_receipt and f_agreement and f_fund:
                 "GT_BUSSNO 사업자번호": biz_no,
                 "3열 주관연구개발기관 또는 공동연구개발기관": role_title,
                 "4열 당해년도": current_year,
+                "GI_CASH 연구개발기관 부담금(현금)": "-",
+                "GI_INK 연구개발기관 부담금(현물)": "-",
                 "GI_GOVFUND 정부지원금(현금)": "-",
-                "GI_PRIVCASH 연구개발기관 부담금(현금)": "-",
-                "GI_PRIVINK 연구개발기관 부담금(현물)": "-"
+                "GI_PRIVCASH 연구개발기관 수행금(현금)": "-",
+                "GI_PRIVINK 연구개발기관 수행금(현물)": "-"
             })
 
     excel_file_bytes = generate_excel_file(agreement_data, sheet2_export_data, current_year, receipt_data)
