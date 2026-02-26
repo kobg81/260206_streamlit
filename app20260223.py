@@ -288,6 +288,7 @@ def generate_excel_file(agreement_data, sheet2_data, current_year, receipt_data)
 
     output.seek(0)
     return output
+
 # =====================================================================
 # 5. Streamlit UI
 # =====================================================================
@@ -295,14 +296,19 @@ st.set_page_config(page_title="연구관리 통합 검증기", layout="wide")
 st.title("🛡️ 협약 데이터 및 당해년도 연구비 통합 검증")
 
 col1, col2 = st.columns(2)
+
 with col1: 
-	st.image("contracts.png", caption="[예시] 협약서 다운로드", use_container_width=True)
-f_agreement = st.file_uploader("1. 협약서 (PDF) - 왼쪽", type=['pdf'])
+    st.image("contracts.png", caption="[예시] 협약서 다운로드", use_container_width=True)
+    f_agreement = st.file_uploader("1. 협약서 (PDF) - 왼쪽", type=['pdf'])
+
 with col2: 
-f_receipt = st.file_uploader("2. 협약접수확인서 (PDF) - 오른쪽", type=['pdf'])
+    # 오른쪽 접수확인서 부분 이미지 추가 (필요시 파일명 변경)
+    st.image("receipts.png", caption="[예시] 협약접수확인서 다운로드", use_container_width=True) 
+    f_receipt = st.file_uploader("2. 협약접수확인서 (PDF) - 오른쪽", type=['pdf'])
 
 st.write("---")
-	st.image("budgets.png", caption="[예시] 사업비 다운로드", use_container_width=True)
+
+st.image("budgets.png", caption="[예시] 사업비 다운로드", use_container_width=True)
 f_fund = st.file_uploader("3. 연구비분담표 (Excel) - 하단", type=['xlsx', 'xls'])
 
 if f_receipt and f_agreement and f_fund:
@@ -343,18 +349,18 @@ if f_receipt and f_agreement and f_fund:
         if current_year_funds:
             for fund in current_year_funds:
                 sheet2_export_data.append({
-			    "GI_ACC_NO 계정번호": "",  # <--- 1열에 빈 값으로 추가
-                            "GI_ORG 개발기관명": org['기관명'],
-                            "GT_BUSSNO 사업자번호": biz_no,
-                            "3열 주관연구개발기관 또는 공동연구개발기관": role_title,
-                            "4열 당해년도": fund['당해년도'],
-                            "GI_GOVFUND 정부지원금(현금)": fund['정부지원금(현금)'],
-                            "GI_PRIVCASH 연구개발기관 부담금(현금)": fund['기관부담금(현금)'],
-                            "GI_PRIVINK 연구개발기관 부담금(현물)": fund['기관부담금(현물)']
+                    "GI_ACC_NO 계정번호": "",  
+                    "GI_ORG 개발기관명": org['기관명'],
+                    "GT_BUSSNO 사업자번호": biz_no,
+                    "3열 주관연구개발기관 또는 공동연구개발기관": role_title,
+                    "4열 당해년도": fund['당해년도'],
+                    "GI_GOVFUND 정부지원금(현금)": fund['정부지원금(현금)'],
+                    "GI_PRIVCASH 연구개발기관 부담금(현금)": fund['기관부담금(현금)'],
+                    "GI_PRIVINK 연구개발기관 부담금(현물)": fund['기관부담금(현물)']
                 })
         else:
             sheet2_export_data.append({
-		"GI_ACC_NO 계정번호": "",  # <--- 1열에 빈 값으로 추가
+                "GI_ACC_NO 계정번호": "",  
                 "GI_ORG 공동연구개발기관명": org['기관명'],
                 "GT_BUSSNO 사업자번호": biz_no,
                 "3열 주관연구개발기관 또는 공동연구개발기관": role_title,
@@ -409,6 +415,4 @@ if f_receipt and f_agreement and f_fund:
             st.warning("⚠️ 단계/년차별 기간 정보를 찾을 수 없습니다.")
 
 elif not (f_receipt and f_agreement and f_fund):
-
     st.info("👆 위 3개의 파일을 모두 업로드하면 분석 결과가 표시됩니다.")
-
