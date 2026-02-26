@@ -66,19 +66,32 @@ def extract_agreement(file_stream, r_data):
         if no_match: info["과제번호"] = no_match.group(1)
 
         target_no = info["과제번호"] if info["과제번호"] != "미추출" else r_data["과제번호"]
-        title_pattern = re.search(r'따라\s+(?:연구개발과제\s*)?(.*?)(?:\s*연구개발과제\s*)?\(\s*연구개발과제번호', clean_text)
+        title_pattern = re.search(r'따라\s+(?:연구개발\s*과제\s*)?(.*?)\s*\(\s*(?:연구개발과\s*제\s*번\s*호|연구개발과제번호|과제번호)', clean_text)
         
         if title_pattern:
             info["과제명"] = title_pattern.group(1).strip()
         else:
+            # 2. 표에서 추출하는 로직 (한 셀에 제목과 내용이 섞여 있는 경우까지 처리)
             for page in pdf.pages:
                 for table in page.extract_tables():
                     for row in table:
-                        row_str = " ".join([str(c) for c in row if c])
+                        # None 값 제거 및 문자열 변환
+                        row_cells = [str(c).replace('\n', ' ').strip() for c in row if c]
+                        row_str = "".join(row_cells).replace(" ", "")
+                        
                         if "연구개발과제명" in row_str:
-                            parts = [str(c).replace('\n', ' ').strip() for c in row if c and len(str(c)) > 15 and "연구개발과제명" not in str(c)]
-                            if parts: 
-                                info["과제명"] = parts[0]
+                            clean_cells = []
+                            for cell in row_cells:
+                                if "연구개발과제명" in cell:
+                                    # 한 칸 안에 "연구개발과제명"과 실제 과제명이 같이 붙어있는 경우 분리해냄
+                                    extracted = cell.replace("연구개발과제명", "").strip()
+                                    if extracted: 
+                                        clean_cells.append(extracted)
+                                else:
+                                    clean_cells.append(cell)
+                            
+                            if clean_cells:
+                                info["과제명"] = " ".join(clean_cells).strip()
                                 break
                     if info["과제명"] != "미추출": break
                 if info["과제명"] != "미추출": break
@@ -288,7 +301,6 @@ def generate_excel_file(agreement_data, sheet2_data, current_year, receipt_data)
 
     output.seek(0)
     return output
-
 # =====================================================================
 # 5. Streamlit UI
 # =====================================================================
@@ -296,15 +308,12 @@ st.set_page_config(page_title="연구관리 통합 검증기", layout="wide")
 st.title("🛡️ 협약 데이터 및 당해년도 연구비 통합 검증")
 st.image("contracts2.png", caption="[예시] IRIS다운로드", use_container_width=True)
 col1, col2 = st.columns(2)
-
 with col1: 
     f_agreement = st.file_uploader("1. 협약서 (PDF) - 왼쪽", type=['pdf'])
-
 with col2: 
     f_receipt = st.file_uploader("2. 협약접수확인서 (PDF) - 오른쪽", type=['pdf'])
 
 st.write("---")
-
 f_fund = st.file_uploader("3. 연구비분담표 (Excel) - 하단", type=['xlsx', 'xls'])
 
 if f_receipt and f_agreement and f_fund:
@@ -345,18 +354,18 @@ if f_receipt and f_agreement and f_fund:
         if current_year_funds:
             for fund in current_year_funds:
                 sheet2_export_data.append({
-                    "GI_ACC_NO 계정번호": "",  
-                    "GI_ORG 개발기관명": org['기관명'],
-                    "GT_BUSSNO 사업자번호": biz_no,
-                    "3열 주관연구개발기관 또는 공동연구개발기관": role_title,
-                    "4열 당해년도": fund['당해년도'],
-                    "GI_GOVFUND 정부지원금(현금)": fund['정부지원금(현금)'],
-                    "GI_PRIVCASH 연구개발기관 부담금(현금)": fund['기관부담금(현금)'],
-                    "GI_PRIVINK 연구개발기관 부담금(현물)": fund['기관부담금(현물)']
+			    "GI_ACC_NO 계정번호": "",  # <--- 1열에 빈 값으로 추가
+                            "GI_ORG 개발기관명": org['기관명'],
+                            "GT_BUSSNO 사업자번호": biz_no,
+                            "3열 주관연구개발기관 또는 공동연구개발기관": role_title,
+                            "4열 당해년도": fund['당해년도'],
+                            "GI_GOVFUND 정부지원금(현금)": fund['정부지원금(현금)'],
+                            "GI_PRIVCASH 연구개발기관 부담금(현금)": fund['기관부담금(현금)'],
+                            "GI_PRIVINK 연구개발기관 부담금(현물)": fund['기관부담금(현물)']
                 })
         else:
             sheet2_export_data.append({
-                "GI_ACC_NO 계정번호": "",  
+		"GI_ACC_NO 계정번호": "",  # <--- 1열에 빈 값으로 추가
                 "GI_ORG 공동연구개발기관명": org['기관명'],
                 "GT_BUSSNO 사업자번호": biz_no,
                 "3열 주관연구개발기관 또는 공동연구개발기관": role_title,
@@ -412,6 +421,3 @@ if f_receipt and f_agreement and f_fund:
 
 elif not (f_receipt and f_agreement and f_fund):
     st.info("👆 위 3개의 파일을 모두 업로드하면 분석 결과가 표시됩니다.")
-
-
-
