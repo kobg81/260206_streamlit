@@ -204,6 +204,15 @@ def extract_fund_excel(file_stream):
         return {}
         
     return fund_data
+# =====================================================================
+# 3_1. 사업자번호 형식변경
+# =====================================================================
+def format_biz_no(biz_no):
+    biz_no = str(biz_no).replace("-", "").replace(" ", "").strip()
+    if len(biz_no) == 10:
+        return f"{biz_no[:3]}-{biz_no[3:5]}-{biz_no[5:]}"
+    return biz_no
+
 
 # =====================================================================
 # 4. [엑셀파일생성] 다운로드용 엑셀 데이터 생성 함수
@@ -219,7 +228,7 @@ def generate_excel_file(agreement_data, sheet2_data, current_year, receipt_data)
         for org in receipt_data["기관정보"]:
             if "주관" in org.get("역할", "") or "총괄" in org.get("역할", ""):
                 lead_org_name = org.get("기관명", "")
-                lead_biz_no = org.get("사업자번호", "")
+                lead_biz_no = format_biz_no(org.get("사업자번호", ""))
                 break
 
     # 당해년도(current_year)에 해당하는 세부 기간 파싱
@@ -345,7 +354,7 @@ if f_receipt and f_agreement and f_fund:
 
     for org in sorted_orgs:
         role_title = "총괄주관연구개발기관" if "총괄" in org["역할"] else ("주관연구개발기관" if "주관" in org["역할"] else "공동연구개발기관")
-        biz_no = org.get("사업자번호", "-")
+        biz_no = format_biz_no(org.get("사업자번호", "-"))
         
         matched_funds = []
         for fname, f_list in fund_excel_data.items():
