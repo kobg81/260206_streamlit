@@ -294,7 +294,7 @@ def generate_excel_file(agreement_data, sheet2_data, current_year, receipt_data)
 # =====================================================================
 st.set_page_config(page_title="연구관리 통합 검증기", layout="wide")
 st.title("🛡️ 협약 데이터 및 당해년도 연구비 통합 검증")
-
+st.image("contracts2.png", caption="[예시] IRIS다운로드", use_container_width=True)
 col1, col2 = st.columns(2)
 
 with col1: 
@@ -412,5 +412,6 @@ if f_receipt and f_agreement and f_fund:
 
 elif not (f_receipt and f_agreement and f_fund):
     st.info("👆 위 3개의 파일을 모두 업로드하면 분석 결과가 표시됩니다.")
+
 
 
